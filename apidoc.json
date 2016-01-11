@@ -1,0 +1,176 @@
+{
+  "name": "apidoc-generator-reference",
+  "description": "",
+
+  "imports": [],
+
+  "models": {
+    "person": {
+      "description": "This is a person",
+      "plural": "people",
+      "fields": [
+        {
+          "name": "id",
+          "type": "string",
+          "description": "Primary Key",
+          "example": "xyz",
+          "minimum": 1,
+          "maximum": 45,
+          "attributes": [
+            {
+              "name": "field_validation",
+              "value": {
+                "regex": "^[A-Za-z]+$"
+              }
+            }
+          ]
+        },
+        {
+          "name": "name",
+          "type": "string",
+          "minimum": 1,
+          "maximum": 255
+        },
+        {
+          "name": "dob",
+          "type": "date-iso8601",
+          "required": false,
+          "attributes": [
+            { "name": "scala_props", "value": { "class": "org.joda.time.LocalDate"} }
+          ]
+        },
+        {
+          "name": "addresses",
+          "type": "[address]",
+          "attributes": [
+            { "name": "validation", "value": { "element_maximum": 45} }
+          ]
+        }
+      ]
+    },
+    "address": {
+      "fields": [
+        {
+          "name": "street",
+          "type": "string",
+          "maximum": 255
+        },
+        {
+          "name": "tags",
+          "type": "[string]"
+        }
+      ]
+    },
+    "healthcheck": {
+      "fields": [
+        {
+          "name": "status",
+          "type": "string",
+          "default": "healthy"
+        }
+      ]
+    },
+    "error": {
+      "description": "An error message from the API.",
+      "fields": [
+        {
+          "name": "status",
+          "type": "string",
+          "description": "A description of the HTTP error code."
+        },
+        {
+          "name": "message",
+          "type": "string",
+          "description": "A description of the error that occurred."
+        }
+      ]
+    },
+    "kafka_movie": {
+      "attributes": [
+        { "name": "kafka_props",
+          "value": {
+            "data_type": "person",
+            "message_generate_key": "v0.id",
+            "topic": "s\"mc-person-master-${tenant}\""
+          }
+        }
+      ],
+      "fields": [
+        {
+          "name": "v0",
+          "type": "person"
+        },
+        {
+          "name": "utc_generated_time",
+          "type": "date-iso8601",
+          "attributes": [
+            { "name": "scala_props", "value":
+              {
+                "class": "org.joda.time.LocalDateTime",
+                "default": "org.joda.time.LocalDateTime.now(org.joda.time.DateTimeZone.UTC)"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  },
+
+  "resources": {
+    "healthcheck": {
+      "path": "/_internal_/healthcheck",
+      "operations": [
+        {
+          "method": "GET",
+          "responses": {
+            "200": {
+              "type": "healthcheck"
+            }
+          }
+        }
+      ]
+    },
+    "person": {
+      "description": "TBC",
+      "path": "/:tenant/v0/",
+      "operations": [
+        {
+          "method": "POST",
+          "path": "person/",
+          "body": {
+            "type": "person"
+          },
+          "responses": {
+            "200": {
+              "type": "person"
+            },
+            "404": {
+              "type": "error"
+            }
+          }
+        },
+        {
+          "method": "POST",
+          "path": "people/",
+          "body": {
+            "type": "[person]"
+          },
+          "responses": {
+            "200": {
+              "type": "integer"
+            },
+            "404": {
+              "type": "error"
+            }
+          }
+        }
+      ]
+    }
+  },
+
+  "unions": {},
+
+  "enums": {},
+
+  "headers": []
+}
