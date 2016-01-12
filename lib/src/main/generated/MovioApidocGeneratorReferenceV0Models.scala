@@ -34,7 +34,7 @@ package movio.apidoc.generator.reference.v0.models {
 
   }
 
-  case class KafkaMovie(
+  case class KafkaPerson(
     v0: movio.apidoc.generator.reference.v0.models.Person,
     utcGeneratedTime: _root_.org.joda.time.LocalDateTime = org.joda.time.LocalDateTime.now(org.joda.time.DateTimeZone.UTC)
   ) extends KafkaMessage {

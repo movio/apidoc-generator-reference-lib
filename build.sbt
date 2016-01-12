@@ -46,7 +46,6 @@ lazy val kafkaLib_0_8 = project
       "com.typesafe.play" %% "play-json" % PlayVersion,
       "movio.api" %% "kafka-lib_0_8" % "0.1.0",
       "movio.core" %% "movio-core-utils" % "0.1.0",
-      "mm" %% "testinglib" % "1.0.1" % "test",
       "mc" %% "kafka-testkit" % "1.3.3" % "test"
     )
   )
@@ -55,12 +54,13 @@ lazy val kafkaLib_0_8 = project
 
 
 lazy val commonSettings: Seq[Setting[_]] = Seq(
-  name <<= name("apidoc generator reference-" + _),
+  name <<= name("apidoc-generator-reference-" + _),
   organization := "com.github",
   unmanagedSourceDirectories in Compile += baseDirectory.value / "src" / "main" / "generated",
   unmanagedSourceDirectories in Test += baseDirectory.value / "src" / "test" / "generated",
   libraryDependencies ++= Seq(
-    "org.scalatest" %% "scalatest" % "2.2.5" % "test"
+    "org.scalatest" %% "scalatest" % "2.2.5" % "test",
+    "mm" %% "testinglib" % "1.0.1" % "test"
   ),
   scalacOptions += "-feature",
   publishTo <<= version { (v: String) ⇒

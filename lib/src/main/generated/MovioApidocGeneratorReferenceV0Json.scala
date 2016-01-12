@@ -83,18 +83,18 @@ package movio.apidoc.generator.reference.v0.models {
       )
     }
 
-    implicit def jsonReadsApidocGeneratorReferenceKafkaMovie: play.api.libs.json.Reads[KafkaMovie] = {
+    implicit def jsonReadsApidocGeneratorReferenceKafkaPerson: play.api.libs.json.Reads[KafkaPerson] = {
       (
         (__ \ "v0").read[movio.apidoc.generator.reference.v0.models.Person] and
         (__ \ "utc_generated_time").read[_root_.org.joda.time.LocalDateTime]
-      )(KafkaMovie.apply _)
+      )(KafkaPerson.apply _)
     }
 
-    implicit def jsonWritesApidocGeneratorReferenceKafkaMovie: play.api.libs.json.Writes[KafkaMovie] = {
+    implicit def jsonWritesApidocGeneratorReferenceKafkaPerson: play.api.libs.json.Writes[KafkaPerson] = {
       (
         (__ \ "v0").write[movio.apidoc.generator.reference.v0.models.Person] and
         (__ \ "utc_generated_time").write[_root_.org.joda.time.LocalDateTime]
-      )(unlift(KafkaMovie.unapply _))
+      )(unlift(KafkaPerson.unapply _))
     }
 
     implicit def jsonReadsApidocGeneratorReferencePerson: play.api.libs.json.Reads[Person] = {

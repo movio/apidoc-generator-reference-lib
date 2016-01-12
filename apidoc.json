@@ -85,7 +85,7 @@
         }
       ]
     },
-    "kafka_movie": {
+    "kafka_person": {
       "attributes": [
         { "name": "kafka_props",
           "value": {

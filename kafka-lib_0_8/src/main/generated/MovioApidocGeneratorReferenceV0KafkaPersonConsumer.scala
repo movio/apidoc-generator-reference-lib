@@ -24,7 +24,7 @@ package movio.apidoc.generator.reference.v0.kafka {
   import movio.apidoc.generator.reference.v0.models._
   import movio.apidoc.generator.reference.v0.models.json._
 
-  object KafkaMovieTopic {
+  object KafkaPersonTopic {
     /**
       The version of the api - apidoc generator enforces this value.
       For use when creating a topic name.
@@ -44,7 +44,7 @@ package movio.apidoc.generator.reference.v0.kafka {
     val topicRegex = s"mc-person-master-" + "(.*)"
   }
 
-  object KafkaMovieConsumer {
+  object KafkaPersonConsumer {
     val base = "movio.apidoc.generator.reference.kafka.consumer"
     val KafkaOffsetStorageType = s"$base.offset-storage-type"
     val KafkaOffsetStorageDualCommit = s"$base.offset-storage-dual-commit"
@@ -52,13 +52,13 @@ package movio.apidoc.generator.reference.v0.kafka {
     val ConsumerZookeeperConnectionKey = s"$base.zookeeper.connection"
   }
 
-  class KafkaMovieConsumer (
+  class KafkaPersonConsumer (
     config: Config,
     consumerGroupId: String
-  ) extends KafkaConsumer[KafkaMovie] {
-    import KafkaMovieConsumer._
+  ) extends KafkaConsumer[KafkaPerson] {
+    import KafkaPersonConsumer._
 
-    val topicFilter = new Whitelist(KafkaMovieTopic.topicRegex)
+    val topicFilter = new Whitelist(KafkaPersonTopic.topicRegex)
 
     lazy val consumerConfig = new ConsumerConfig(readConsumerPropertiesFromConfig)
     lazy val consumer = Consumer.create(consumerConfig)
@@ -85,11 +85,11 @@ package movio.apidoc.generator.reference.v0.kafka {
     }
 
     def processBatchThenCommit(
-      processor: Map[String, Seq[KafkaMovie]] ⇒ Try[Map[String, Seq[KafkaMovie]]],
+      processor: Map[String, Seq[KafkaPerson]] ⇒ Try[Map[String, Seq[KafkaPerson]]],
       batchSize: Int = 1
-    ): Try[Map[String, Seq[KafkaMovie]]] = {
+    ): Try[Map[String, Seq[KafkaPerson]]] = {
       @tailrec
-      def fetchBatch(remainingInBatch: Int, messages: Map[String, Seq[KafkaMovie]]): Try[Map[String, Seq[KafkaMovie]]] ={
+      def fetchBatch(remainingInBatch: Int, messages: Map[String, Seq[KafkaPerson]]): Try[Map[String, Seq[KafkaPerson]]] ={
         if (remainingInBatch == 0) {
           Success(messages)
         } else {
@@ -98,8 +98,8 @@ package movio.apidoc.generator.reference.v0.kafka {
             iterator.next()
           } match {
             case Success(message) =>
-              val entity = Json.parse(message.message).as[KafkaMovie]
-              val KafkaMovieTopic.topicRegex.r(tenant) = message.topic
+              val entity = Json.parse(message.message).as[KafkaPerson]
+              val KafkaPersonTopic.topicRegex.r(tenant) = message.topic
 
               val newSeq = messages.get(tenant).getOrElse(Seq.empty) :+ entity
               val newMessages = messages + (tenant -> newSeq)

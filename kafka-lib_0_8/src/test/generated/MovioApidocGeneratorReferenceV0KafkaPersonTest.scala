@@ -19,7 +19,7 @@ import movio.testtools.MovioSpec
 import movio.testtools.kafka.{ KafkaTestKit, KafkaTestKitUtils }
 
 
-class KafkaMovieTests extends MovioSpec with KafkaTestKit {
+class KafkaPersonTests extends MovioSpec with KafkaTestKit {
   import movio.apidoc.generator.reference.v0.models._
 
   val kafkaServer = createKafkaServer()
@@ -30,11 +30,11 @@ class KafkaMovieTests extends MovioSpec with KafkaTestKit {
     zkServer.stop()
   }
 
-  describe("KafkaMovie Producer and Consumer") {
+  describe("KafkaPerson Producer and Consumer") {
     it("should timeout with no messages") {
       new Fixture {
         awaitCondition("Message should get processed") {
-          def processor(messages: Map[String, Seq[KafkaMovie]]): Try[Map[String, Seq[KafkaMovie]]] =  Success(messages)
+          def processor(messages: Map[String, Seq[KafkaPerson]]): Try[Map[String, Seq[KafkaPerson]]] =  Success(messages)
           consumer.processBatchThenCommit(processor) shouldBe Success(Map.empty)
         }
 
@@ -49,7 +49,7 @@ class KafkaMovieTests extends MovioSpec with KafkaTestKit {
 
         // And consume it
         awaitCondition("Message should get processed") {
-          def processor(messages: Map[String, Seq[KafkaMovie]]): Try[Map[String, Seq[KafkaMovie]]] = {
+          def processor(messages: Map[String, Seq[KafkaPerson]]): Try[Map[String, Seq[KafkaPerson]]] = {
             println(messages)
             println("do some side effecting stuff here")
             Success(messages)
@@ -70,7 +70,7 @@ class KafkaMovieTests extends MovioSpec with KafkaTestKit {
 
         // And consume it
         awaitCondition("Message should get processed") {
-          def processor(messages: Map[String, Seq[KafkaMovie]]): Try[Map[String, Seq[KafkaMovie]]] =  {
+          def processor(messages: Map[String, Seq[KafkaPerson]]): Try[Map[String, Seq[KafkaPerson]]] =  {
             println(messages)
             println("do some side effecting stuff here")
             Success(messages)
@@ -111,12 +111,12 @@ class KafkaMovieTests extends MovioSpec with KafkaTestKit {
       |""".stripMargin)
       .withFallback(ConfigFactory.load())
 
-    val producer = new KafkaMovieProducer(testConfig)
-    val consumer = new KafkaMovieConsumer(testConfig, new java.util.Random().nextInt.toString)
+    val producer = new KafkaPersonProducer(testConfig)
+    val consumer = new KafkaPersonConsumer(testConfig, new java.util.Random().nextInt.toString)
   }
 
   val entity1 = 
-    KafkaMovie (
+    KafkaPerson (
       v0 = 
         Person (
           id = "id1",
@@ -127,7 +127,7 @@ class KafkaMovieTests extends MovioSpec with KafkaTestKit {
       utcGeneratedTime = org.joda.time.LocalDateTime.now(org.joda.time.DateTimeZone.UTC)
     )
   val entity2 = 
-    KafkaMovie (
+    KafkaPerson (
       v0 = 
         Person (
           id = "id2",

@@ -23,7 +23,7 @@ package movio.apidoc.generator.reference.v0.kafka {
   import movio.apidoc.generator.reference.v0.models._
   import movio.apidoc.generator.reference.v0.models.json._
 
-  class KafkaMovieProducer(config: Config) extends KafkaProducer[KafkaMovie, Person] {
+  class KafkaPersonProducer(config: Config) extends KafkaProducer[KafkaPerson, Person] {
 
     val BrokerListKey = s"movio.apidoc.generator.reference.kafka.producer.broker-connection-string"
 
@@ -44,13 +44,13 @@ package movio.apidoc.generator.reference.v0.kafka {
       send(Seq(single), tenant).map(_.head)
     }
 
-    def sendWrapped(single: KafkaMovie, tenant: String): Try[KafkaMovie] = {
+    def sendWrapped(single: KafkaPerson, tenant: String): Try[KafkaPerson] = {
       sendWrapped(Seq(single), tenant).map(_.head)
     }
 
     def send(batch: Seq[Person], tenant: String): Try[Seq[Person]] = {
-      val topic = KafkaMovieTopic.topic(tenant)
-      val messages = batch.map(KafkaMovie(_))
+      val topic = KafkaPersonTopic.topic(tenant)
+      val messages = batch.map(KafkaPerson(_))
       Try {
         producer.send(messages map { message =>
                         new KeyedMessage[String, String](topic, message.generateKey(tenant), Json.stringify(Json.toJson(message)))
@@ -62,8 +62,8 @@ package movio.apidoc.generator.reference.v0.kafka {
       }
     }
 
-    def sendWrapped(batch: Seq[KafkaMovie], tenant: String): Try[Seq[KafkaMovie]] = {
-      val topic = KafkaMovieTopic.topic(tenant)
+    def sendWrapped(batch: Seq[KafkaPerson], tenant: String): Try[Seq[KafkaPerson]] = {
+      val topic = KafkaPersonTopic.topic(tenant)
       Try {
         producer.send(batch map { message =>
                         new KeyedMessage[String, String](topic, message.generateKey(tenant), Json.stringify(Json.toJson(message)))
