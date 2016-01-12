@@ -10,8 +10,11 @@ package movio.apidoc.generator.reference.v0.models {
     tags: Seq[String]
   ) {
 
-    import Validation._
-    validateLength("street", street, 255)
+  import Validation._
+
+  validateLength("street", street, 255)
+  validateLengthOfAll("tags", tags, 5)
+
   }
 
   /**
@@ -22,7 +25,9 @@ package movio.apidoc.generator.reference.v0.models {
     message: String
   ) {
 
-    import Validation._
+  import Validation._
+
+
 
   }
 
@@ -30,7 +35,9 @@ package movio.apidoc.generator.reference.v0.models {
     status: String = "healthy"
   ) {
 
-    import Validation._
+  import Validation._
+
+
 
   }
 
@@ -39,7 +46,9 @@ package movio.apidoc.generator.reference.v0.models {
     utcGeneratedTime: _root_.org.joda.time.LocalDateTime = org.joda.time.LocalDateTime.now(org.joda.time.DateTimeZone.UTC)
   ) extends KafkaMessage {
 
-    import Validation._
+  import Validation._
+
+
     def generateKey(tenant: String) = v0.id
   }
 
@@ -53,9 +62,12 @@ package movio.apidoc.generator.reference.v0.models {
     addresses: Seq[movio.apidoc.generator.reference.v0.models.Address]
   ) {
 
-    import Validation._
-    validateLength("id", id, 45)
-    validateLength("name", name, 255)
+  import Validation._
+
+  validateLength("id", id, 5)
+  validateRegex("id", id, "^[A-Za-z0-9]+$")
+  validateLength("name", name, 255)
+
   }
 
   object Validation {
@@ -80,6 +92,10 @@ package movio.apidoc.generator.reference.v0.models {
       values foreach { value ⇒
         validateLength(name, value, length)
       }
+    }
+
+    def validateRegex(name: String, value: String, regex: String): Unit = {
+      require(regex.r.findFirstIn(value).isDefined, s"$name did not match regex: $regex")
     }
 
   }
