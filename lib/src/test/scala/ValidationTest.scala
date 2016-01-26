@@ -21,6 +21,9 @@ class ValiationTest extends MovioSpec {
         Person("test-name", "name", None, Seq.empty)
       }
     }
+    it("should validiate regexs within a [string]") {
+      fail
+    }
   }
 
   describe("array validation") {
