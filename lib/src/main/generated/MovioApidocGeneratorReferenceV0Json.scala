@@ -86,14 +86,14 @@ package movio.apidoc.generator.reference.v0.models {
     implicit def jsonReadsApidocGeneratorReferenceKafkaPerson: play.api.libs.json.Reads[KafkaPerson] = {
       (
         (__ \ "v0").read[movio.apidoc.generator.reference.v0.models.Person] and
-        (__ \ "utc_generated_time").read[_root_.org.joda.time.LocalDate]
+        (__ \ "utc_generated_time").read[_root_.org.joda.time.LocalDateTime]
       )(KafkaPerson.apply _)
     }
 
     implicit def jsonWritesApidocGeneratorReferenceKafkaPerson: play.api.libs.json.Writes[KafkaPerson] = {
       (
         (__ \ "v0").write[movio.apidoc.generator.reference.v0.models.Person] and
-        (__ \ "utc_generated_time").write[_root_.org.joda.time.LocalDate]
+        (__ \ "utc_generated_time").write[_root_.org.joda.time.LocalDateTime]
       )(unlift(KafkaPerson.unapply _))
     }
 

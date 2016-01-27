@@ -124,7 +124,7 @@ class KafkaPersonTests extends MovioSpec with KafkaTestKit {
           dob = None,
           addresses = List.empty
         ),
-      utcGeneratedTime = new org.joda.time.Date()
+      utcGeneratedTime = org.joda.time.LocalDateTime.now(org.joda.time.DateTimeZone.UTC)
     )
   val entity2 = 
     KafkaPerson (
@@ -135,6 +135,6 @@ class KafkaPersonTests extends MovioSpec with KafkaTestKit {
           dob = None,
           addresses = List.empty
         ),
-      utcGeneratedTime = new org.joda.time.Date()
+      utcGeneratedTime = org.joda.time.LocalDateTime.now(org.joda.time.DateTimeZone.UTC)
     )
 }
