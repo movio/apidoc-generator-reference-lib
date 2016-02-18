@@ -11,8 +11,11 @@ package movio.apidoc.generator.reference.v0.models {
   ) {
 
     import Validation._
-    validateLength("street", street, 255)
-    validateLengthOfAll("tags", tags, 5)
+    validateMaxLength("street", street, 255)
+    validateMaxSize("tags", tags, 10)
+    validateMinSize("tags", tags, 1)
+    validateMaxLengthOfAll("tags", tags, 20)
+    validateMinLengthOfAll("tags", tags, 5)
 
   }
 
@@ -59,33 +62,91 @@ package movio.apidoc.generator.reference.v0.models {
   ) {
 
     import Validation._
-    validateLength("id", id, 5)
+    validateMaxLength("id", id, 5)
+    validateMinLength("id", id, 1)
     validateRegex("id", id, "^[A-Za-z0-9]+$")
-    validateLength("name", name, 255)
+    validateMaxLength("name", name, 255)
+    validateMinLength("name", name, 1)
 
   }
 
   object Validation {
 
-    def validateLength(name: String, value: _root_.scala.Option[String], length: Int): Unit = {
+    def validateMaxLength(name: String, value: _root_.scala.Option[String], length: Int): Unit = {
       value foreach { value ⇒
-        validateLength(name, value, length)
+        validateMaxLength(name, value, length)
       }
     }
 
-    def validateLength(name: String, value: String, length: Int): Unit = {
+    def validateMax[T](name: String, value: T, max: T)(implicit n:Numeric[T]): Unit = {
+      require(n.lteq(value , max), s"$name must be less than or equal to $max")
+    }
+
+    def validateMin[T](name: String, value: T, min: T)(implicit n:Numeric[T]): Unit = {
+      require(n.gteq(value , min), s"$name must be greater than or equal to $min")
+    }
+
+    def validateMaxSize(name: String, value: Seq[_], size: Int): Unit = {
+      require(value.size <= size, s"$name must have less than $size items")
+    }
+
+    def validateMinSize(name: String, value: Seq[_], size: Int): Unit = {
+      require(value.size >= size, s"$name must have less than $size items")
+    }
+
+    def validateMaxLength(name: String, value: String, length: Int): Unit = {
       require(value.length <= length, s"$name must be $length characters or less")
     }
 
-    def validateLengthOfAll(name: String, values: _root_.scala.Option[Seq[String]], length: Int): Unit = {
+    def validateMinLength(name: String, value: String, length: Int): Unit = {
+      require(value.length >= length, s"$name must be more than $length characters")
+    }
+
+    def validateMaxLengthOfAll(name: String, values: _root_.scala.Option[Seq[String]], length: Int): Unit = {
       values foreach { values ⇒
-        validateLengthOfAll(name, values, length)
+        validateMaxLengthOfAll(name, values, length)
       }
     }
 
-    def validateLengthOfAll(name: String, values: Seq[String], length: Int): Unit = {
+    def validateMaxLengthOfAll(name: String, values: Seq[String], length: Int): Unit = {
       values foreach { value ⇒
-        validateLength(name, value, length)
+        validateMaxLength(name, value, length)
+      }
+    }
+
+    def validateMinLengthOfAll(name: String, values: _root_.scala.Option[Seq[String]], length: Int): Unit = {
+      values foreach { values ⇒
+        validateMinLengthOfAll(name, values, length)
+      }
+    }
+
+    def validateMinLengthOfAll(name: String, values: Seq[String], length: Int): Unit = {
+      values foreach { value ⇒
+        validateMinLength(name, value, length)
+      }
+    }
+
+    def validateMaxLengthOfAll[T](name: String, values: Seq[T], max: T)(implicit n: Numeric[T]): Unit = {
+      values foreach { value ⇒
+        validateMax(name, value, max)
+      }
+    }
+
+    def validateMinLengthOfAll[T](name: String, values: Seq[T], min: T)(implicit n: Numeric[T]): Unit = {
+      values foreach { value ⇒
+        validateMin(name, value, min)
+      }
+    }
+
+    def validateMaxLengthOfAll[T](name: String, values: _root_.scala.Option[Seq[T]], max: T)(implicit n: Numeric[T]): Unit = {
+      values foreach { values ⇒
+        validateMaxLengthOfAll(name, values, max)
+      }
+    }
+
+    def validateMinLengthOfAll[T](name: String, values: _root_.scala.Option[Seq[T]], min: T)(implicit n: Numeric[T]): Unit = {
+      values foreach { values ⇒
+        validateMinLengthOfAll(name, values, min)
       }
     }
 

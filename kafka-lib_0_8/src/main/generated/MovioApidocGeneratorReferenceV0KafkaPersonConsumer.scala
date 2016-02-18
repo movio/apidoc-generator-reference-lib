@@ -126,7 +126,7 @@ package movio.apidoc.generator.reference.v0.kafka {
       }
     }
 
-    def shutdown = { consumer.shutdown }
+    def shutdown() = consumer.shutdown()
   }
 }
 

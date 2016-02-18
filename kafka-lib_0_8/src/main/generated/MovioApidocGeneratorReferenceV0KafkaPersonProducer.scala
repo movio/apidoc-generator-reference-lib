@@ -74,6 +74,8 @@ package movio.apidoc.generator.reference.v0.kafka {
           throw new KafkaProducerException(s"Failed to publish $topic message, to kafka queue.", ex)
       }
     }
+
+    def shutdown() = producer.close()
   }
 
 }

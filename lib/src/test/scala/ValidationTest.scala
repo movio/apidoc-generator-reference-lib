@@ -30,7 +30,7 @@ class ValiationTest extends MovioSpec {
     it("should validiate max length in array") {
       intercept[IllegalArgumentException] {
         Address("street", List(
-                  "123456"
+                  "123456789012345678901"
                 ))
       }
     }
