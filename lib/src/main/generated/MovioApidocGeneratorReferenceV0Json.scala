@@ -45,11 +45,18 @@ package movio.apidoc.generator.reference.v0.models {
       }
     }
 
-    implicit def jsonReadsApidocGeneratorReferenceAddress: play.api.libs.json.Reads[Address] = {
-      (
-        (__ \ "street").read[String] and
-        (__ \ "tags").read[Seq[String]]
-      )(Address.apply _)
+    implicit def jsonReadsApidocGeneratorReferenceAddress: play.api.libs.json.Reads[Address] = new play.api.libs.json.Reads[Address] {
+      def reads(json: play.api.libs.json.JsValue) = {
+        try {
+          (
+            (__ \ "street").read[String] and
+            (__ \ "tags").read[Seq[String]]
+          )(Address.apply _).reads(json)
+        } catch {
+          // Catch Validation Errors
+          case ex: IllegalArgumentException => play.api.libs.json.JsError(s"${ex.getMessage}")
+        }
+      }
     }
 
     implicit def jsonWritesApidocGeneratorReferenceAddress: play.api.libs.json.Writes[Address] = {
@@ -59,11 +66,18 @@ package movio.apidoc.generator.reference.v0.models {
       )(unlift(Address.unapply _))
     }
 
-    implicit def jsonReadsApidocGeneratorReferenceError: play.api.libs.json.Reads[Error] = {
-      (
-        (__ \ "status").read[String] and
-        (__ \ "message").read[String]
-      )(Error.apply _)
+    implicit def jsonReadsApidocGeneratorReferenceError: play.api.libs.json.Reads[Error] = new play.api.libs.json.Reads[Error] {
+      def reads(json: play.api.libs.json.JsValue) = {
+        try {
+          (
+            (__ \ "status").read[String] and
+            (__ \ "message").read[String]
+          )(Error.apply _).reads(json)
+        } catch {
+          // Catch Validation Errors
+          case ex: IllegalArgumentException => play.api.libs.json.JsError(s"${ex.getMessage}")
+        }
+      }
     }
 
     implicit def jsonWritesApidocGeneratorReferenceError: play.api.libs.json.Writes[Error] = {
@@ -73,8 +87,15 @@ package movio.apidoc.generator.reference.v0.models {
       )(unlift(Error.unapply _))
     }
 
-    implicit def jsonReadsApidocGeneratorReferenceHealthcheck: play.api.libs.json.Reads[Healthcheck] = {
-      (__ \ "status").read[String].map { x => new Healthcheck(status = x) }
+    implicit def jsonReadsApidocGeneratorReferenceHealthcheck: play.api.libs.json.Reads[Healthcheck] = new play.api.libs.json.Reads[Healthcheck] {
+      def reads(json: play.api.libs.json.JsValue) = {
+        try {
+          (__ \ "status").read[String].map { x => new Healthcheck(status = x) }.reads(json)
+        } catch {
+          // Catch Validation Errors
+          case ex: IllegalArgumentException => play.api.libs.json.JsError(s"${ex.getMessage}")
+        }
+      }
     }
 
     implicit def jsonWritesApidocGeneratorReferenceHealthcheck: play.api.libs.json.Writes[Healthcheck] = new play.api.libs.json.Writes[Healthcheck] {
@@ -83,11 +104,18 @@ package movio.apidoc.generator.reference.v0.models {
       )
     }
 
-    implicit def jsonReadsApidocGeneratorReferenceKafkaPerson: play.api.libs.json.Reads[KafkaPerson] = {
-      (
-        (__ \ "v0").read[movio.apidoc.generator.reference.v0.models.Person] and
-        (__ \ "utc_generated_time").read[_root_.org.joda.time.LocalDateTime]
-      )(KafkaPerson.apply _)
+    implicit def jsonReadsApidocGeneratorReferenceKafkaPerson: play.api.libs.json.Reads[KafkaPerson] = new play.api.libs.json.Reads[KafkaPerson] {
+      def reads(json: play.api.libs.json.JsValue) = {
+        try {
+          (
+            (__ \ "v0").read[movio.apidoc.generator.reference.v0.models.Person] and
+            (__ \ "utc_generated_time").read[_root_.org.joda.time.LocalDateTime]
+          )(KafkaPerson.apply _).reads(json)
+        } catch {
+          // Catch Validation Errors
+          case ex: IllegalArgumentException => play.api.libs.json.JsError(s"${ex.getMessage}")
+        }
+      }
     }
 
     implicit def jsonWritesApidocGeneratorReferenceKafkaPerson: play.api.libs.json.Writes[KafkaPerson] = {
@@ -97,13 +125,20 @@ package movio.apidoc.generator.reference.v0.models {
       )(unlift(KafkaPerson.unapply _))
     }
 
-    implicit def jsonReadsApidocGeneratorReferencePerson: play.api.libs.json.Reads[Person] = {
-      (
-        (__ \ "id").read[String] and
-        (__ \ "name").read[String] and
-        (__ \ "dob").readNullable[_root_.org.joda.time.LocalDate] and
-        (__ \ "addresses").read[Seq[movio.apidoc.generator.reference.v0.models.Address]]
-      )(Person.apply _)
+    implicit def jsonReadsApidocGeneratorReferencePerson: play.api.libs.json.Reads[Person] = new play.api.libs.json.Reads[Person] {
+      def reads(json: play.api.libs.json.JsValue) = {
+        try {
+          (
+            (__ \ "id").read[String] and
+            (__ \ "name").read[String] and
+            (__ \ "dob").readNullable[_root_.org.joda.time.LocalDate] and
+            (__ \ "addresses").read[Seq[movio.apidoc.generator.reference.v0.models.Address]]
+          )(Person.apply _).reads(json)
+        } catch {
+          // Catch Validation Errors
+          case ex: IllegalArgumentException => play.api.libs.json.JsError(s"${ex.getMessage}")
+        }
+      }
     }
 
     implicit def jsonWritesApidocGeneratorReferencePerson: play.api.libs.json.Writes[Person] = {
