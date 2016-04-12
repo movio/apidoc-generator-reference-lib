@@ -21,7 +21,10 @@ package movio.apidoc.generator.reference.v0.kafka {
   import movio.apidoc.generator.reference.v0.models._
   import movio.apidoc.generator.reference.v0.models.json._
 
-  class KafkaPersonProducer(config: Config) extends KafkaProducer[KafkaPerson, Person] {
+  class KafkaPersonProducer(
+    config: Config,
+    topicResolver: String => String = KafkaPersonTopic.topic
+  ) extends KafkaProducer[KafkaPerson, Person] {
 
     val BrokerListKey = s"movio.apidoc.generator.reference.kafka.producer.broker-connection-string"
 
@@ -47,7 +50,7 @@ package movio.apidoc.generator.reference.v0.kafka {
     }
 
     def send(batch: Seq[Person], tenant: String): scala.util.Try[Seq[Person]] = {
-      val topic = KafkaPersonTopic.topic(tenant)
+      val topic = topicResolver(tenant)
       val messages = batch.map(KafkaPerson(_))
       scala.util.Try {
         producer.send(messages map { message =>
@@ -61,7 +64,7 @@ package movio.apidoc.generator.reference.v0.kafka {
     }
 
     def sendWrapped(batch: Seq[KafkaPerson], tenant: String): scala.util.Try[Seq[KafkaPerson]] = {
-      val topic = KafkaPersonTopic.topic(tenant)
+      val topic = topicResolver(tenant)
       scala.util.Try {
         producer.send(batch map { message =>
                         new KeyedMessage[String, String](topic, message.generateKey(tenant), Json.stringify(Json.toJson(message)))

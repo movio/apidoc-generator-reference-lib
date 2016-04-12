@@ -8,6 +8,7 @@ import java.util.Properties
 
 import scala.language.postfixOps
 import scala.annotation.tailrec
+import scala.util.matching.Regex
 
 import com.typesafe.config.Config
 
@@ -34,7 +35,7 @@ package movio.apidoc.generator.reference.v0.kafka {
     /**
       The name of the kafka topic to publish and consume messages from.
       This is a scala statedment/code that that gets executed
-      Example: `s"mc-servicename-${apiVersion}-${tenant}"` 
+      Example: `s"mc-servicename-${apiVersion}-${tenant}"`
 
       @param tenant is the customer id, eg vc_regalus
       */
@@ -51,13 +52,18 @@ package movio.apidoc.generator.reference.v0.kafka {
     val ConsumerZookeeperConnectionKey = s"$base.zookeeper.connection"
   }
 
+  /**
+    If you choose to override `topicRegex`, make sure the first group captures
+    the tenant names.
+   */
   class KafkaPersonConsumer (
     config: Config,
-    consumerGroupId: String
+    consumerGroupId: String,
+    topicRegex: Regex = KafkaPersonTopic.topicRegex.r
   ) extends KafkaConsumer[KafkaPerson] {
     import KafkaPersonConsumer._
 
-    val topicFilter = new Whitelist(KafkaPersonTopic.topicRegex)
+    val topicFilter = new Whitelist(topicRegex.toString)
 
     lazy val consumerConfig = new ConsumerConfig(readConsumerPropertiesFromConfig)
     lazy val consumer = Consumer.create(consumerConfig)
@@ -98,7 +104,7 @@ package movio.apidoc.generator.reference.v0.kafka {
           } match {
             case scala.util.Success(message) =>
               val entity = Json.parse(message.message).as[KafkaPerson]
-              val KafkaPersonTopic.topicRegex.r(tenant) = message.topic
+              val topicRegex(tenant) = message.topic
 
               val newSeq = messages.get(tenant).getOrElse(Seq.empty) :+ entity
               val newMessages = messages + (tenant -> newSeq)
