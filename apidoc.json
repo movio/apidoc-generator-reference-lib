@@ -151,7 +151,7 @@
             "type": "person"
           },
           "responses": {
-            "200": {
+            "201": {
               "type": "person"
             },
             "404": {
