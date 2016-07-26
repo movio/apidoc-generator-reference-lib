@@ -31,10 +31,10 @@ class JsonParsingTest extends MovioSpec {
 
       Json.parse(json).as[Person]
     }
-    it("should support tz offsets") {
+    it("should retain offsets") {
       val json = """{"id":"1","name":"John","lastActiveTime":"2016-12-24T15:36:54+0400","addresses":[]}"""
 
-      Json.parse(json).as[Person]
+      Json.parse(json).as[Person].lastActiveTime.get.getZone.getID shouldBe "+04:00"
     }
     it("should support milliseconds") {
       val json = """{"id":"1","name":"John","lastActiveTime":"2016-12-24T15:36:54.932+0400","addresses":[]}"""
