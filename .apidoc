@@ -1,7 +1,7 @@
 code:
-  movio:
+  movio.cinema:
     apidoc-generator-reference:
-      version: 0.1.0-SNAPSHOT 
+      version: 0.0.1-SNAPSHOT 
       generators:
         advanced_scala_models: lib/src/main/generated
         play_2_x_json_standalone: lib/src/main/generated
