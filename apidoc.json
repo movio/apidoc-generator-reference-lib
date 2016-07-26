@@ -32,6 +32,14 @@
           "maximum": 255
         },
         {
+          "name": "lastActiveTime",
+          "type": "date-iso8601",
+          "required": false,
+          "attributes": [
+            { "name": "scala_field_props", "value": { "class": "org.joda.time.DateTime"} }
+          ]
+        },
+        {
           "name": "dob",
           "type": "date-iso8601",
           "required": false,

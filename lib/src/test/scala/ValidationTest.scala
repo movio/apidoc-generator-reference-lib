@@ -1,4 +1,4 @@
-package movio.apidoc.generator.reference
+package movio.cinema.apidoc.generator.reference
 
 import scala.util.Try
 import scala.util.Success
@@ -13,12 +13,12 @@ import movio.testtools.MovioSpec
 
 
 class ValiationTest extends MovioSpec {
-  import movio.apidoc.generator.reference.v0.models._
+  import movio.cinema.apidoc.generator.reference.v0.models._
 
   describe("regex validation") {
     it("should validiate id field") {
       intercept[IllegalArgumentException] {
-        Person("test-name", "name", None, Seq.empty)
+        Person("test-name", "name", None, None, Seq.empty)
       }
     }
     it("should validiate regexs within a [string]") {
