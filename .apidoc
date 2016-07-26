@@ -1,10 +1,10 @@
 code:
-  movio.cinema:
+  movio:
     apidoc-generator-reference:
-      version: 0.0.1-SNAPSHOT 
+      version: 0.1.0-SNAPSHOT 
       generators:
-        advanced_scala_models: lib/src/main/generated
-        play_2_x_json_standalone: lib/src/main/generated
-        play_2_4_client: play-client/src/main/generated
-        kafka_0_8: kafka-lib_0_8/src/main/generated
-        kafka_0_8_tests: kafka-lib_0_8/src/test/generated
+        test_advanced_scala_models: lib/src/main/generated
+        test_play_2_x_json_standalone: lib/src/main/generated
+        test_play_2_4_client: play-client/src/main/generated
+        test_kafka_0_8: kafka-lib_0_8/src/main/generated
+        test_kafka_0_8_tests: kafka-lib_0_8/src/test/generated

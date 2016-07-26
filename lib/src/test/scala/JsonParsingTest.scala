@@ -1,4 +1,4 @@
-package movio.cinema.apidoc.generator.reference
+package movio.apidoc.generator.reference
 
 import scala.util.Try
 import scala.util.Success
@@ -17,8 +17,8 @@ import movio.testtools.MovioSpec
 
 
 class JsonParsingTest extends MovioSpec {
-  import movio.cinema.apidoc.generator.reference.v0.models._
-  import movio.cinema.apidoc.generator.reference.v0.models.json._
+  import movio.apidoc.generator.reference.v0.models._
+  import movio.apidoc.generator.reference.v0.models.json._
 
   describe("datetime validation") {
 
