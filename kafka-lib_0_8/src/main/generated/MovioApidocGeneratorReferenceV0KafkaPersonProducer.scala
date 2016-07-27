@@ -21,12 +21,18 @@ package movio.apidoc.generator.reference.v0.kafka {
   import movio.apidoc.generator.reference.v0.models._
   import movio.apidoc.generator.reference.v0.models.json._
 
-  class KafkaPersonProducer(
-    config: Config,
-    topicResolver: String => String = KafkaPersonTopic.topic
-  ) extends KafkaProducer[KafkaPerson, Person] {
+  object KafkaPersonProducer {
+    val base = "movio.apidoc.generator.reference.kafka.producer"
+    val BrokerListKey = s"$base.broker-connection-string"
+    val TopicInstanceKey = s"$base.topic-instance"
+  }
 
-    val BrokerListKey = s"movio.apidoc.generator.reference.kafka.producer.broker-connection-string"
+  class KafkaPersonProducer(
+    config: Config
+  ) extends KafkaProducer[KafkaPerson, Person] {
+    import KafkaPersonProducer._
+
+    lazy val topicResolver = KafkaPersonTopic.topic(config.getString(TopicInstanceKey))(_)
 
     lazy val producerConfig = new ProducerConfig(readProducerPropertiesFromConfig(config))
     lazy val producer = new Producer[String, String](producerConfig)

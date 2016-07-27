@@ -8,6 +8,7 @@ import java.util.Properties
 
 import scala.language.postfixOps
 import scala.annotation.tailrec
+import scala.collection.JavaConversions._
 import scala.util.matching.Regex
 
 import com.typesafe.config.Config
@@ -35,13 +36,27 @@ package movio.apidoc.generator.reference.v0.kafka {
     /**
       The name of the kafka topic to publish and consume messages from.
       This is a scala statedment/code that that gets executed
-      Example: `s"mc-servicename-${apiVersion}-${tenant}"`
+      Example: `s"mc-servicename-${apiVersion}-${instance}-${tenant}"`
 
+      @param instance an instance of the topic, eg uat, prod. It's read from the config.
       @param tenant is the customer id, eg vc_regalus
       */
-    def topic(tenant: String) = s"mc-person-master-${tenant}"
+    def topic(instance: String)(tenant: String) = s"mc.data.person.${apiVersion}.${instance}.${tenant}"
 
-    val topicRegex = s"mc-person-master-" + "(.*)"
+    /**
+      The regex for the kafka consumer to match topics.
+
+      @param instance an instance of the topic, eg uat, prod. It's read from the config.
+      @param tenants the tenants of the topics from which the consumer consumes. If it's empty,
+             all tenants are matched.
+      */
+    def topicRegex(inst: String, tenants: Seq[String]) = {
+      val instance = Regex.quote(inst)
+      val tenantsPattern = if (tenants.isEmpty) ".*"
+                           else tenants.map(Regex.quote(_)).mkString("|")
+
+      s"mc.data.person.${apiVersion}.${instance}.($tenantsPattern)"
+    }
   }
 
   object KafkaPersonConsumer {
@@ -50,6 +65,8 @@ package movio.apidoc.generator.reference.v0.kafka {
     val KafkaOffsetStorageDualCommit = s"$base.offset-storage-dual-commit"
     val ConsumerTimeoutKey = s"$base.timeout.ms"
     val ConsumerZookeeperConnectionKey = s"$base.zookeeper.connection"
+    val TopicInstanceKey = s"$base.topic-instance"
+    val TenantsKey = s"$base.tenants"
   }
 
   /**
@@ -58,12 +75,17 @@ package movio.apidoc.generator.reference.v0.kafka {
    */
   class KafkaPersonConsumer (
     config: Config,
-    consumerGroupId: String,
-    topicRegex: Regex = KafkaPersonTopic.topicRegex.r
+    consumerGroupId: String
   ) extends KafkaConsumer[KafkaPerson] {
     import KafkaPersonConsumer._
 
-    val topicFilter = new Whitelist(topicRegex.toString)
+    lazy val topicRegex: Regex =
+      KafkaPersonTopic.topicRegex(
+        config.getString(TopicInstanceKey),
+        config.getStringList(TenantsKey)
+      ).r
+
+    lazy val topicFilter = new Whitelist(topicRegex.toString)
 
     lazy val consumerConfig = new ConsumerConfig(readConsumerPropertiesFromConfig)
     lazy val consumer = Consumer.create(consumerConfig)
@@ -104,18 +126,18 @@ package movio.apidoc.generator.reference.v0.kafka {
           } match {
             case scala.util.Success(message) =>
               val payload = message.message
-              val newMessages = 
+              val newMessages =
                 if (payload != null) {
                   val entity = Json.parse(payload).as[KafkaPerson]
                   val topicRegex(tenant) = message.topic
-  
+
                   val newSeq = messages.get(tenant).getOrElse(Seq.empty) :+ entity
-                  
+
                   messages + (tenant -> newSeq)
                 } else {
                   messages
                 }
-              
+
               fetchBatch(remainingInBatch - 1, newMessages)
             case scala.util.Failure(ex) => ex match {
               case ex: ConsumerTimeoutException ⇒

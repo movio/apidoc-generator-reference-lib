@@ -101,7 +101,7 @@
           "value": {
             "data_type": "person",
             "message_generate_key": "v0.id",
-            "topic": "s\"mc-person-master-${tenant}\""
+            "topic": "s\"mc.data.person.${apiVersion}.${instance}.${tenant}\""
           }
         }
       ],
