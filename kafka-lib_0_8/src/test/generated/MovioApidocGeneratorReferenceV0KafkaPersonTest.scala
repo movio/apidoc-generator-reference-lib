@@ -42,7 +42,7 @@ class KafkaPersonTests extends MovioSpec with KafkaTestKit {
     it("should send and receive a message") {
       new Fixture {
         // Produce test message
-        producer.sendWrapped(entity1, tenant)
+        producer.sendWrapped(entity1, tenant).get
 
         // And consume it
         awaitCondition("Message should get processed") {
@@ -63,7 +63,7 @@ class KafkaPersonTests extends MovioSpec with KafkaTestKit {
         val entities = Seq(entity1, entity2)
 
         // Produce test message
-        producer.sendWrapped(entities, tenant)
+        producer.sendWrapped(entities, tenant).get
 
         // And consume it
         awaitCondition("Message should get processed") {
@@ -82,13 +82,13 @@ class KafkaPersonTests extends MovioSpec with KafkaTestKit {
 
     it("consumer ignores null payload messages, to support deletes on topics with compaction") {
       new Fixture {
-        val topic = KafkaPersonTopic.topic(tenant)
+        val topic = KafkaPersonTopic.topic(topicInstance)(tenant)
         val rawProducer = createKeyedProducer[String, String](topic, kafkaServer)(k ⇒ k, m ⇒ m)
 
-        producer.sendWrapped(entity1, tenant)
+        producer.sendWrapped(entity1, tenant).get
         // Produce null payload message
         rawProducer.send("anId", null)
-        producer.sendWrapped(entity2, tenant)
+        producer.sendWrapped(entity2, tenant).get
 
         // And consume them
         var consumedEntities = Seq.empty[KafkaPerson]
@@ -115,6 +115,7 @@ class KafkaPersonTests extends MovioSpec with KafkaTestKit {
   trait Fixture {
 
     val brokerConnectionString = kafkaServer.config.hostName + ":" + kafkaServer.config.port
+    val topicInstance = "test"
     val tenant = KafkaTestKitUtils.tempTopic()
 
     val testConfig = ConfigFactory.parseString(s"""
@@ -125,11 +126,14 @@ class KafkaPersonTests extends MovioSpec with KafkaTestKit {
       |movio.apidoc.generator.reference.kafka {
       |  producer {
       |    broker-connection-string : "$brokerConnectionString"
+      |    topic-instance = "$topicInstance"
       |  }
       |}
       |
       |movio.apidoc.generator.reference.kafka {
       |  consumer {
+      |    topic-instance = "$topicInstance"
+      |    tenants = ["ignore_me", "$tenant"]
       |    offset-storage-type = "kafka"
       |    offset-storage-dual-commit = false
       |    timeout.ms = "100"

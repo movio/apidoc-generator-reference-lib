@@ -2,7 +2,7 @@ organization := "com.github"
 
 name := "apidoc-generator-reference-lib"
 
-crossScalaVersions := Seq("2.10.6", "2.11.7")
+scalaVersion := "2.11.8"
 
 val PlayVersion = "2.4.4"
 val KafkaVersion_0_8 = "0.8.2.2"
@@ -56,6 +56,7 @@ lazy val kafkaLib_0_8 = project
 lazy val commonSettings: Seq[Setting[_]] = Seq(
   name <<= name("apidoc-generator-reference-" + _),
   organization := "com.github",
+  scalaVersion := "2.11.8",
   unmanagedSourceDirectories in Compile += baseDirectory.value / "src" / "main" / "generated",
   unmanagedSourceDirectories in Test += baseDirectory.value / "src" / "test" / "generated",
   libraryDependencies ++= Seq(
