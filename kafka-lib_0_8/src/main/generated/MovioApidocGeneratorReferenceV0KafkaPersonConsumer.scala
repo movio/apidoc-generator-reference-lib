@@ -75,14 +75,15 @@ package movio.apidoc.generator.reference.v0.kafka {
    */
   class KafkaPersonConsumer (
     config: Config,
-    consumerGroupId: String
+    consumerGroupId: String,
+    tenants: Option[Seq[String]] = None
   ) extends KafkaConsumer[KafkaPerson] {
     import KafkaPersonConsumer._
 
     lazy val topicRegex: Regex =
       KafkaPersonTopic.topicRegex(
         config.getString(TopicInstanceKey),
-        config.getStringList(TenantsKey)
+        tenants.getOrElse(config.getStringList(TenantsKey))
       ).r
 
     lazy val topicFilter = new Whitelist(topicRegex.toString)
