@@ -38,9 +38,10 @@ package movio.apidoc.generator.reference.v0.kafka {
       This is a scala statedment/code that that gets executed
       Example: `s"mc-servicename-${apiVersion}-${instance}-${tenant}"`
 
+      @param instance an instance of the topic, eg uat, prod. It's read from the config.
       @param tenant is the customer id, eg vc_regalus
       */
-    def topic(instance: String)(tenant: String) = s"mc-person-master-${tenant}"
+    def topic(instance: String)(tenant: String) = s"mc.data.person.${apiVersion}.${instance}.${tenant}"
 
     /**
       The regex for the kafka consumer to match topics.
@@ -54,7 +55,7 @@ package movio.apidoc.generator.reference.v0.kafka {
       val tenantsPattern = if (tenants.isEmpty) ".*"
                            else tenants.map(Regex.quote(_)).mkString("|")
 
-      s"mc-person-master-($tenantsPattern)"
+      s"mc.data.person.${apiVersion}.${instance}.($tenantsPattern)"
     }
   }
 
