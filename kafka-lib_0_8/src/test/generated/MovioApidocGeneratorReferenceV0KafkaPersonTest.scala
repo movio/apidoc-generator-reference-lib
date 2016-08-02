@@ -80,6 +80,32 @@ class KafkaPersonTests extends MovioSpec with KafkaTestKit {
       }
     }
 
+    it("messages keys should be available to the processor") {
+      new Fixture {
+        val entities = Seq(entity1, entity2)
+
+        // Produce test message
+        producer.sendWrapped(entities, tenant).get
+
+        // And consume it
+        awaitCondition("Message should get processed") {
+          def processor(messages: Map[String, Seq[(String, Option[KafkaPerson])]]) = {
+            println(messages)
+            println("do some side effecting stuff here")
+            scala.util.Success(messages)
+          }
+
+          // Use distinct because there are items in the queue from other tests
+          consumer.processBatchWithKeysThenCommit(processor, 100).get(tenant) shouldBe Seq(
+            key1 → Some(entity1),
+            key2 → Some(entity2)
+          )
+        }
+
+        consumer.shutdown
+      }
+    }
+
     it("consumer ignores null payload messages, to support deletes on topics with compaction") {
       new Fixture {
         val topic = KafkaPersonTopic.topic(topicInstance)(tenant)
@@ -146,9 +172,7 @@ class KafkaPersonTests extends MovioSpec with KafkaTestKit {
 
     val producer = new KafkaPersonProducer(testConfig)
     val consumer = new KafkaPersonConsumer(testConfig, new java.util.Random().nextInt.toString)
-  }
-
-  val entity1 = 
+    val entity1 = 
     KafkaPerson (
       v0 = 
         Person (
@@ -160,7 +184,9 @@ class KafkaPersonTests extends MovioSpec with KafkaTestKit {
         ),
       utcGeneratedTime = org.joda.time.LocalDateTime.now(org.joda.time.DateTimeZone.UTC)
     )
-  val entity2 = 
+    val key1 = entity1.generateKey(tenant)
+
+    val entity2 = 
     KafkaPerson (
       v0 = 
         Person (
@@ -172,4 +198,7 @@ class KafkaPersonTests extends MovioSpec with KafkaTestKit {
         ),
       utcGeneratedTime = org.joda.time.LocalDateTime.now(org.joda.time.DateTimeZone.UTC)
     )
+    val key2 = entity2.generateKey(tenant)
+  }
+
 }
