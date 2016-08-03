@@ -44,7 +44,7 @@ lazy val kafkaLib_0_8 = project
   .settings(
     libraryDependencies ++= Seq(
       "com.typesafe.play" %% "play-json" % PlayVersion,
-      "movio.api" %% "kafka-lib_0_8" % "0.1.0",
+      "movio.api" %% "kafka-lib_0_8" % "0.3.0",
       "movio.core" %% "movio-core-utils" % "0.1.0",
       "mc" %% "kafka-testkit" % "1.3.3" % "test"
     )

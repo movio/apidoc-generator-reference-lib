@@ -69,10 +69,6 @@ package movio.apidoc.generator.reference.v0.kafka {
     val TenantsKey = s"$base.tenants"
   }
 
-  /**
-    If you choose to override `topicRegex`, make sure the first group captures
-    the tenant names.
-   */
   class KafkaPersonConsumer (
     config: Config,
     consumerGroupId: String,
@@ -112,12 +108,49 @@ package movio.apidoc.generator.reference.v0.kafka {
       properties
     }
 
+    /**
+      * Process a batch of messages with given processor function and commit
+      * offsets if it succeeds. Messages with null payloads are ignored.
+      *
+      * @param processor processor function that takes a map of messages for different tenants
+      * @param batchSize the maximum number of messages to process
+      */
     def processBatchThenCommit(
       processor: Map[String, Seq[KafkaPerson]] ⇒ scala.util.Try[Map[String, Seq[KafkaPerson]]],
       batchSize: Int = 1
-    ): scala.util.Try[Map[String, Seq[KafkaPerson]]] = {
+    ): scala.util.Try[Map[String, Seq[KafkaPerson]]] =
+      doProcess[KafkaPerson] { message ⇒
+        Option(message.message).map(Json.parse(_).as[KafkaPerson])
+      }(processor, batchSize)
+
+    /**
+      * Process a batch of messages with given processor function and commit
+      * offsets if it succeeds.
+      *
+      * Each message is a tuple of the key and the payload deserialised to
+      * `Option[T]` which is `None` when the message has a null payload.
+      *
+      * @param processor processor function that takes a map of messages for different tenants
+      * @param batchSize the maximum number of messages to process
+      */
+    def processBatchWithKeysThenCommit(
+      processor: Map[String, Seq[(String, Option[KafkaPerson])]] ⇒ scala.util.Try[Map[String, Seq[(String, Option[KafkaPerson])]]],
+      batchSize: Int = 1
+    ): scala.util.Try[Map[String, Seq[(String, Option[KafkaPerson])]]] =
+      doProcess[(String,  Option[KafkaPerson])] { message ⇒
+        Some(
+          message.key → Option(message.message).map(Json.parse(_).as[KafkaPerson])
+        )
+      }(processor, batchSize)
+
+    def doProcess[T](
+      converter: MessageAndMetadata[String, String] ⇒ Option[T]
+    )(
+      processor: Map[String, Seq[T]] ⇒ scala.util.Try[Map[String, Seq[T]]],
+      batchSize: Int = 1
+    ): scala.util.Try[Map[String, Seq[T]]] = {
       @tailrec
-      def fetchBatch(remainingInBatch: Int, messages: Map[String, Seq[KafkaPerson]]): scala.util.Try[Map[String, Seq[KafkaPerson]]] ={
+      def fetchBatch(remainingInBatch: Int, messages: Map[String, Seq[T]]): scala.util.Try[Map[String, Seq[T]]] ={
         if (remainingInBatch == 0) {
           scala.util.Success(messages)
         } else {
@@ -125,39 +158,37 @@ package movio.apidoc.generator.reference.v0.kafka {
           scala.util.Try {
             iterator.next()
           } match {
-            case scala.util.Success(message) =>
-              val payload = message.message
-              val newMessages =
-                if (payload != null) {
-                  val entity = Json.parse(payload).as[KafkaPerson]
-                  val topicRegex(tenant) = message.topic
+            case scala.util.Success(message) ⇒
+              val newMessages = converter(message) map { entity ⇒
+                val topicRegex(tenant) = message.topic
+                val newSeq = messages.get(tenant).getOrElse(Seq.empty) :+ entity
 
-                  val newSeq = messages.get(tenant).getOrElse(Seq.empty) :+ entity
-
-                  messages + (tenant -> newSeq)
-                } else {
-                  messages
-                }
+                messages + (tenant → newSeq)
+              } getOrElse messages
 
               fetchBatch(remainingInBatch - 1, newMessages)
-            case scala.util.Failure(ex) => ex match {
-              case ex: ConsumerTimeoutException ⇒
-                // Consumer timed out waiting for a message. Ending batch.
-                scala.util.Success(messages)
-              case ex =>
-                scala.util.Failure(ex)
-            }
+
+            case scala.util.Failure(ex) ⇒
+              ex match {
+                case ex: ConsumerTimeoutException ⇒
+                  // Consumer timed out waiting for a message. Ending batch.
+                  scala.util.Success(messages)
+                case ex ⇒
+                  scala.util.Failure(ex)
+              }
           }
         }
       }
 
       fetchBatch(batchSize, Map.empty) match {
-        case scala.util.Success(messages) =>
-          processor(messages) map { allMessages =>
+        case scala.util.Success(messages) ⇒
+          processor(messages) map { allMessages ⇒
             consumer.commitOffsets(true)
             allMessages
           }
-        case scala.util.Failure(ex) => scala.util.Failure(ex)
+
+        case scala.util.Failure(ex) ⇒
+          scala.util.Failure(ex)
       }
     }
 
