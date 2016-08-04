@@ -50,6 +50,10 @@
         {
           "name": "addresses",
           "type": "[address]"
+        },
+        {
+          "name": "gender",
+          "type": "gender"
         }
       ]
     },
@@ -180,7 +184,25 @@
 
   "unions": {},
 
-  "enums": {},
+  "enums": {
+    "gender": {
+      "description": "Gender of a `Person`",
+      "values": [
+        {
+          "name": "male",
+          "description": "male person"
+        },
+        {
+          "name": "female",
+          "description": "female person"
+        },
+        {
+          "name": "other",
+          "description": "other"
+        }
+      ]
+    }
+  },
 
   "headers": []
 }

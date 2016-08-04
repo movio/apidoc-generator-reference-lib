@@ -180,7 +180,8 @@ class KafkaPersonTests extends MovioSpec with KafkaTestKit {
           name = "name1",
           lastActiveTime = None,
           dob = None,
-          addresses = List.empty
+          addresses = List.empty,
+          gender = Gender.Male
         ),
       utcGeneratedTime = org.joda.time.LocalDateTime.now(org.joda.time.DateTimeZone.UTC)
     )
@@ -194,7 +195,8 @@ class KafkaPersonTests extends MovioSpec with KafkaTestKit {
           name = "name2",
           lastActiveTime = None,
           dob = None,
-          addresses = List.empty
+          addresses = List.empty,
+          gender = Gender.Male
         ),
       utcGeneratedTime = org.joda.time.LocalDateTime.now(org.joda.time.DateTimeZone.UTC)
     )
