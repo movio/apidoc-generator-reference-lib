@@ -102,7 +102,7 @@ package movio.apidoc.generator.reference.v0.models {
     private[this]
     val byName = all.map(x => x.toString.toLowerCase -> x).toMap
 
-    def apply(value: String): Gender = fromString(value).getOrElse(throw new IllegalArgumentException(s"$value is not valid."))
+    def apply(value: String): Gender = fromString(value).getOrElse(throw new IllegalArgumentException(s"$value is not a valid Gender."))
 
     def fromString(value: String): _root_.scala.Option[Gender] = byName.get(value.toLowerCase)
 
