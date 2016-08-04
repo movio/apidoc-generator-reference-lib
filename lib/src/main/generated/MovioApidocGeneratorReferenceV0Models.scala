@@ -59,7 +59,8 @@ package movio.apidoc.generator.reference.v0.models {
     name: String,
     lastActiveTime: _root_.scala.Option[_root_.org.joda.time.DateTime] = None,
     dob: _root_.scala.Option[_root_.org.joda.time.LocalDate] = None,
-    addresses: Seq[movio.apidoc.generator.reference.v0.models.Address]
+    addresses: Seq[movio.apidoc.generator.reference.v0.models.Address],
+    gender: movio.apidoc.generator.reference.v0.models.Gender
   ) {
 
     import Validation._
@@ -68,6 +69,42 @@ package movio.apidoc.generator.reference.v0.models {
     validateRegex("id", id, "^[A-Za-z0-9]+$")
     validateMaxLength("name", name, 255)
     validateMinLength("name", name, 1)
+
+  }
+
+  /**
+   * Gender of a `Person`
+   */
+  sealed trait Gender
+
+  object Gender {
+
+    /**
+     * male person
+     */
+    case object Male extends Gender { override def toString = "male" }
+    /**
+     * female person
+     */
+    case object Female extends Gender { override def toString = "female" }
+    /**
+     * other
+     */
+    case object Other extends Gender { override def toString = "other" }
+
+    /**
+     * all returns a list of all the valid, known values. We use
+     * lower case to avoid collisions with the camel cased values
+     * above.
+     */
+    val all = Seq(Male, Female, Other)
+
+    private[this]
+    val byName = all.map(x => x.toString.toLowerCase -> x).toMap
+
+    def apply(value: String): Gender = fromString(value).getOrElse(throw new IllegalArgumentException(s"$value is not valid."))
+
+    def fromString(value: String): _root_.scala.Option[Gender] = byName.get(value.toLowerCase)
 
   }
 

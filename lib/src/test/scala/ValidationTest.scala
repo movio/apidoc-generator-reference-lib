@@ -18,7 +18,7 @@ class ValiationTest extends MovioSpec {
   describe("regex validation") {
     it("should validiate id field") {
       intercept[IllegalArgumentException] {
-        Person("test-name", "name", None, None, Seq.empty)
+        Person("test-name", "name", None, None, Seq.empty, Gender.Male)
       }
     }
     it("should validiate regexs within a [string]") {

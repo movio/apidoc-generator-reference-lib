@@ -63,6 +63,11 @@ package movio.apidoc.generator.reference.v0.models {
       def writes(x: org.joda.time.DateTimeZone) = JsString(x.getID)
     }
 
+    implicit val jsonReadsApidocGeneratorReferenceGender = __.read[String].map(Gender.apply)
+    implicit val jsonWritesApidocGeneratorReferenceGender = new Writes[Gender] {
+      def writes(x: Gender) = JsString(x.toString)
+    }
+
     object AddressFields {
       val street = "street"
       val tags = "tags"
@@ -168,6 +173,7 @@ package movio.apidoc.generator.reference.v0.models {
       val lastActiveTime = "lastActiveTime"
       val dob = "dob"
       val addresses = "addresses"
+      val gender = "gender"
     }
 
     implicit def jsonReadsApidocGeneratorReferencePerson: play.api.libs.json.Reads[Person] = new play.api.libs.json.Reads[Person] {
@@ -178,7 +184,8 @@ package movio.apidoc.generator.reference.v0.models {
             (__ \ PersonFields.name).read[String] and
             (__ \ PersonFields.lastActiveTime).readNullable[_root_.org.joda.time.DateTime] and
             (__ \ PersonFields.dob).readNullable[_root_.org.joda.time.LocalDate] and
-            (__ \ PersonFields.addresses).read[Seq[movio.apidoc.generator.reference.v0.models.Address]]
+            (__ \ PersonFields.addresses).read[Seq[movio.apidoc.generator.reference.v0.models.Address]] and
+            (__ \ PersonFields.gender).read[movio.apidoc.generator.reference.v0.models.Gender]
           )(Person.apply _).reads(json)
         } catch {
           // Catch Validation Errors
@@ -193,7 +200,8 @@ package movio.apidoc.generator.reference.v0.models {
         (__ \ PersonFields.name).write[String] and
         (__ \ PersonFields.lastActiveTime).writeNullable[_root_.org.joda.time.DateTime] and
         (__ \ PersonFields.dob).writeNullable[_root_.org.joda.time.LocalDate] and
-        (__ \ PersonFields.addresses).write[Seq[movio.apidoc.generator.reference.v0.models.Address]]
+        (__ \ PersonFields.addresses).write[Seq[movio.apidoc.generator.reference.v0.models.Address]] and
+        (__ \ PersonFields.gender).write[movio.apidoc.generator.reference.v0.models.Gender]
       )(unlift(Person.unapply _))
     }
   }
