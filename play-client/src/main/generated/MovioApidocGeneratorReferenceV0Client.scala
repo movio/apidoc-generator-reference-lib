@@ -198,7 +198,7 @@ package movio.apidoc.generator.reference.v0 {
       result
     }
 
-    def close: Unit = {
+    def close(): Unit = {
       client match {
         case Some(c) =>
           if (! autoClose)
